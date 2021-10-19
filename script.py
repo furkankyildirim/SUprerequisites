@@ -1,6 +1,55 @@
 from bs4 import BeautifulSoup
 import requests
 import json
+import re
+
+PREREQUISITE_RE = re.compile("(\w+) level  ((\w+) ([0-9]+))( Minimum Grade of (\w))?")
+
+
+
+def parse_prereq_string(prereqs):
+  print(prereqs)
+  prereqs = prereqs.replace(" and ", "&")
+  prereqs = prereqs.replace(" or ", "|")
+
+  if "&" not in prereqs and "|" not in prereqs:
+    # this is just one prereq, format it correctly
+    match = PREREQUISITE_RE.search(prereqs)
+    if not match: return ""
+    return "".join(match.group(3,4))
+
+  res = ""
+  substr = ""
+  in_brackets = False
+
+  for i in range(len(prereqs)):
+    c = prereqs[i]
+    # if inside brackets: parse the insidesd recursively
+    # parse insides of brackets recursively
+    if c == ")":
+      in_brackets = False
+      res += "(" + parse_prereq_string(substr) + ")"
+      substr = ""
+      continue
+    
+    if c == "(":
+      in_brackets = True
+      continue
+
+    if in_brackets:
+      substr += c
+      continue
+    
+
+    if c == "&" or c == "|":
+      res+=parse_prereq_string(substr)+c
+      substr = ""
+      continue
+
+    substr += c
+  res+=parse_prereq_string(substr)
+  print(res)
+  return res
 
 class CoursePrerequisites:
 
@@ -64,15 +113,10 @@ class CoursePrerequisites:
       #: Make sure that the course has any prerequisites
       if prerequisites_tag != None:
         #: Finds all prerequisites
-        course_prerequisites_tag = prerequisites_tag.find_next_siblings('a')
+        prerequisites_texts = prerequisites_tag.next_siblings
 
         #: Cleans the prerequisites data
-        for item in course_prerequisites_tag:
-          if item.text != ' ':
-            prerequisites += (item.text + ', ')
-        
-      #: Clean the prerequisites
-      prerequisites = prerequisites[:-2]
+        prerequisites = parse_prereq_string("".join([item.text for item in prerequisites_texts if item.text != " "]))
 
       #: Appends to all Prerequisites dictionary
       self.Prerequisites[course_tag] = prerequisites        
