@@ -68,13 +68,6 @@ for (name, prerequisites_string) in prereq_strings_dict.items():
         prereqs_dict[name] = eval(prerequisites_string, courses_dict)
 
 
-# In[4]:
-
-
-# check results
-prereqs_dict["ACC301"]
-
-
 # In[5]:
 
 
@@ -92,14 +85,6 @@ def get_all_prereqs(prerequisites, course=None, ret=set()):
         if isinstance(sub_course_symbol, Symbol) and sub_course_symbol.name in prereqs_dict:
             get_all_prereqs(prereqs_dict[sub_course_symbol.name], sub_course_symbol, ret)
     return ret
-
-
-# In[6]:
-
-
-# test recursion with a 2 level deep example
-get_all_prereqs(prereqs_dict["CS515"], courses_dict["CS515"])
-
 
 # In[7]:
 
@@ -167,22 +152,6 @@ def simplify_prereqs(course_prerequisites, verbose=True):
             # remove A from the prereq string by making it the identity for this operation
             parts[i] = course_prerequisites.func.identity
     return course_prerequisites.func(*parts)
-
-
-# In[11]:
-
-
-def check(course):
-    print("checking", course+":\ncurrent prereq is:")
-    print(prereqs_dict[course])
-    print("processed prereq is:")
-    print("\n"+str(simplify_prereqs(prereqs_dict[course])))
-    print("\n")
-
-check("POLS302")
-check("POLS409")
-check("POLS410")
-
 
 # In[12]:
 
