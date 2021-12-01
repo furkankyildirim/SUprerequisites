@@ -11,9 +11,6 @@ from sympy.logic.boolalg import BooleanFunction
 
 import json
 import re
-import time
-
-chrono1 = time.perf_counter()
 
 def parse_course_name(full_name):
     return "".join(full_name.split(" - ")[0].split(" "))
@@ -21,16 +18,6 @@ def parse_course_name(full_name):
 with open("CoursePrerequisites.json", "r") as f:
     courses = json.loads(f.read())
     
-# https://stackoverflow.com/a/25244576
-def strike(text):
-    result = ''
-    for c in text:
-        result = result + c + '\u0336'
-    return result
-
-
-# In[2]:
-
 
 fullnames_dict = {} # full course name -> course name
 courses_dict = {} # course name -> course symbol
@@ -159,8 +146,6 @@ def simplify_prereqs(course_prerequisites, verbose=True):
 # use our methods to analyze all courses that have prerequisites, then save the simplified prerequisites
 changes = {}
 new_prereqs_dict = {}
-c = 0
-chrono2 = time.perf_counter()
 
 for (full_name, name) in fullnames_dict.items():
     if name in prereqs_dict:
@@ -173,17 +158,6 @@ for (full_name, name) in fullnames_dict.items():
         
     else:
         new_prereqs_dict[full_name] = ""
-
-end = time.perf_counter()
-chrono1 = end - chrono1
-chrono2 = end - chrono2
-print("Analysis complete,", c, "prerequisite expressions in", chrono2, "seconds.")
-print("Average of", chrono2/c, "seconds per expression.")
-print("Totals:")
-print("\tcourses:", len(new_prereqs_dict))
-print("\tchanges:", len(changes))
-print("\ttime:", chrono1, "seconds")
-
 
 # save outputs
 with open('updatedValues.json', 'w') as fp:
