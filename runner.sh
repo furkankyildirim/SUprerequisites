@@ -1,8 +1,5 @@
-NUM_WORKERS=3
-TIMEOUT=600
-
 exec gunicorn Service:app \
---workers $NUM_WORKERS \
---timeout $TIMEOUT \
+--workers=6 \
+--timeout=3600 \
 --log-level=debug \
---bind=127.0.0.1:5001 \
+--bind=0.0.0.0:5001 \

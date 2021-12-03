@@ -78,6 +78,10 @@ class CoursePrerequisites:
     #: Gets all courses urls and append to list
     for item in title_list:
       href = item.find('a').get('href')
+
+      if 'https://suis.sabanciuniv.edu/' not in href:
+        href = 'https://suis.sabanciuniv.edu/' + href
+        
       courses_link_list.append(href)
 
     #: returns response
