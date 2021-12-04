@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, send_file
 from configparser import ConfigParser
-from .analysis import Analyze
+from .analysis import Analyze, CycleError
 from .script import CoursePrerequisites
 import os
 
@@ -31,12 +31,19 @@ def uploadCatalog():
         }))
 
     CoursePrerequisites(catalog, term)
-    Analyze(term)
+    try:
+        Analyze(term)
+        return(jsonify({
+            "message": "Course catalog was uploaded to the system and analyzed.",
+            "isSuccess": True
+        }))
+    except CycleError as e:
+        return jsonify({
+            "message": "Course catalog has cycles, analysis was not completed.",
+            "errors": e.cyclics,
+            "isSuccess": False
+        })
 
-    return(jsonify({
-        "message": "Course catalog was uploaded to the system and analyzed.",
-        "isSuccess": True
-    }))
 
 
 @app.route('/delete')
