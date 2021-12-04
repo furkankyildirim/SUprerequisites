@@ -19,6 +19,11 @@ def index():
     return jsonify(data)
 
 
+@app.route('/terms')
+def getTerms():
+    return jsonify([file[:file.find('.')] for file in os.listdir(app.config["CATALOG_PATH"]+'/Originals') if os.path.isfile(os.path.join(app.config["CATALOG_PATH"]+'/Originals', file))])
+
+
 @app.route('/upload')
 def uploadCatalog():
 
@@ -48,27 +53,23 @@ def uploadCatalog():
         })
 
 
-
 @app.route('/delete')
 def deleteCatalog():
     term = request.args.get('term')
 
     if os.path.isfile(app.config['CATALOG_PATH'] + '/Originals/' + term + '.json'):
         os.remove(app.config['CATALOG_PATH'] + '/Originals/' + term + '.json')
+    
+    if os.path.isfile(app.config['CATALOG_PATH'] + '/Changes/' + term + '.json'):
         os.remove(app.config['CATALOG_PATH'] + '/Changes/' + term + '.json')
+
+    if os.path.isfile(app.config['CATALOG_PATH'] + '/Updates/' + term + '.json'):
         os.remove(app.config['CATALOG_PATH'] + '/Updates/' + term + '.json')
 
-        return(jsonify({
-            "message": "Course catalog and analyzes have been successfully deleted from the system.",
-            "isSuccess": True
-        }))
-
-    else:
-        return(jsonify({
-            "message": "Course catalog and analysis are not available in the system.",
-            "isSuccess": False
-        }))
-
+    return(jsonify({
+        "message": "Course catalog and analyzes have been successfully deleted from the system.",
+        "isSuccess": True
+    }))
 
 @app.route('/prerequisites')
 def getPrerequisites():
