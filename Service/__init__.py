@@ -21,6 +21,9 @@ def index():
 
 @app.route('/upload')
 def uploadCatalog():
+
+    if "file" not in request.files:
+        return jsonify({"message": "Please attach a file.", "isSuccess": False})
     catalog = request.files['file']
     term = request.args.get('term')
 
@@ -31,12 +34,19 @@ def uploadCatalog():
         }))
 
     CoursePrerequisites(catalog, term)
-    Analyze(term)
+    try:
+        Analyze(term)
+        return(jsonify({
+            "message": "Course catalog was uploaded to the system and analyzed.",
+            "isSuccess": True
+        }))
+    except Analyze.CycleError as e:
+        return jsonify({
+            "message": "Course catalog has cycles, analysis was not completed.",
+            "errors": e.cyclics,
+            "isSuccess": False
+        })
 
-    return(jsonify({
-        "message": "Course catalog was uploaded to the system and analyzed.",
-        "isSuccess": True
-    }))
 
 
 @app.route('/delete')
