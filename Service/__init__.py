@@ -46,6 +46,9 @@ def uploadCatalog():
             "isSuccess": True
         }))
     except Analyze.CycleError as e:
+        # delete the faulty catalog from storage
+        os.remove(app.config['CATALOG_PATH']+'/Originals/' + term + '.json')
+
         return jsonify({
             "message": "Course catalog has cycles, analysis was not completed.",
             "errors": e.cyclics,
