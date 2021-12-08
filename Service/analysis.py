@@ -20,6 +20,9 @@ class Analyze():
         """Exception for when there are ambiguous prerequisites in the given input"""
         pass
     
+    class UnsatisfiableError(ProblemCoursesError):
+        """Exception for when there are prerequisites that cannot be fulfilled without having taken a course that is no longer in the catalog"""
+        pass
 
     
     def __init__(self, term, **kwargs):
@@ -41,7 +44,9 @@ class Analyze():
             if kwargs.get("raise_ambiguous", False):
                 if len(self.ambiguous):
                     raise Analyze.AmbiguousError(self.ambiguous)
-
+            
+            self.missing_courses = set()
+            
             for (name, prerequisites_string) in self.prereq_strings_dict.items():
                 if not prerequisites_string:
                     continue
@@ -57,8 +62,9 @@ class Analyze():
                         for new_course_name in re.findall("\w+", prerequisites_string):
                             # create a symbol for the course if doesnt exist
                             if new_course_name not in self.courses_dict:
-                                self.courses_dict[new_course_name] = Symbol(
-                                    new_course_name)
+                                s = Symbol(new_course_name)
+                                self.courses_dict[new_course_name] = s
+                                self.missing_courses.add(s)
                     self.prereqs_dict[name] = eval(
                         prerequisites_string, self.courses_dict)
 
@@ -68,13 +74,26 @@ class Analyze():
             if len(cyclics):
                 raise Analyze.CycleError(cyclics)
 
+                
+            # if asked, check if the course is not takeable without any of the missing courses
+            if kwargs.get("raise_unsatisfiable", False):
+                unsatisfiables = {
+                    name: {"prerequisites": prereqs, "missing_courses": self.missing_courses & prereqs.atoms()} 
+                    for (name, prereqs) in self.prereqs_dict.items()
+                    if not satisfiable(prereqs & ~Or(*self.missing_courses))
+                }
+                
+                raise Analyze.UnsatisfiableError(unsatisfiables)
+                
+
+                
             # use our methods to analyze all courses that have prerequisites, then save the simplified prerequisites
             self.changes = {}
             self.new_prereqs_dict = {}
 
             for (full_name, name) in self.fullnames_dict.items():
-                if name in self.prereqs_dict:
-                    prereqs = self.prereqs_dict[name]
+                if name in self.prereqs_dict:    
+                    prereqs = self.prereqs_dict[name]                        
                     new_prereqs = self.simplify_prereqs(prereqs, False)
                     self.new_prereqs_dict[full_name] = new_prereqs
                     if not prereqs.equals(new_prereqs):
