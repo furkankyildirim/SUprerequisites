@@ -5,13 +5,24 @@ import json
 import re
 
 class Analyze():
-    class CycleError(Exception):
+    
+    class ProblemCoursesError(Exception):
+        """Exception for when some courses that are being analyzed are problematic"""
+
+        def __init__(self, problems: dict):
+            self.problems = problems
+    
+    class CycleError(ProblemCoursesError):
         """Exception for when there is a cycle in the input"""
+        pass
 
-        def __init__(self, cyclics: list):
-            self.cyclics = cyclics
+    class AmbiguousError(ProblemCoursesError):
+        """Exception for when there are ambiguous prerequisites in the given input"""
+        pass
+    
 
-    def __init__(self, term):
+    
+    def __init__(self, term, **kwargs):
         with open("Catalogs/Originals/" + term + ".json", "r") as f:
             courses = json.loads(f.read())
 
@@ -25,6 +36,11 @@ class Analyze():
                 self.fullnames_dict[course_name] = name
                 self.courses_dict[name] = Symbol(name)
                 self.prereq_strings_dict[name] = prerequisites
+            
+            self.ambiguous = {name: prereq_text for name, prereq_text in self.prereq_strings_dict.items() if Analyze.is_ambiguous(prereq_text)}
+            if kwargs.get("raise_ambiguous", False):
+                if len(self.ambiguous):
+                    raise Analyze.AmbiguousError(self.ambiguous)
 
             for (name, prerequisites_string) in self.prereq_strings_dict.items():
                 if not prerequisites_string:
@@ -47,8 +63,8 @@ class Analyze():
                         prerequisites_string, self.courses_dict)
 
             # check if there are any cycles
-            cyclics = [name for (name, prereqs) in self.prereqs_dict.items()
-                       if self.is_cyclic(prereqs, self.courses_dict[name], set())]
+            cyclics = {name: prereqs for (name, prereqs) in self.prereqs_dict.items()
+                       if self.is_cyclic(prereqs, self.courses_dict[name], set())}
             if len(cyclics):
                 raise Analyze.CycleError(cyclics)
 
@@ -79,7 +95,34 @@ class Analyze():
     @staticmethod
     def parse_course_name(full_name):
         return "".join(full_name.split(" - ")[0].split(" "))
-
+    
+    
+    @staticmethod
+    # returns true if given prereq text is ambiguous
+    def is_ambiguous(prereq_text):
+        # see if the top level (outside paranthesis) has all same connector (| or &)
+        connector = ""
+        inside_brackets = False
+        substatement = ""
+        for c in prereq_text:
+            if inside_brackets:
+                if c == ")":
+                    if is_ambiguous(substatement):
+                        return True
+                    inside_brackets = False
+                    substatement = ""
+                else:
+                    substatement += c
+            elif c == "(":
+                inside_brackets = True
+            elif c == "|" or c == "&":
+                if connector:
+                    if c != connector:
+                        return True
+                else:
+                   connector = c
+        return False
+    
     # returns true if any cycles exist in the expr or prerequisites of expr
     def is_cyclic(self, expr, search, hist):
         print("searching if", search, "is cyclic in", expr, "seen", hist)
