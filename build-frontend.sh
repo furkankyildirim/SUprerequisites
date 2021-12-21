@@ -1,3 +1,3 @@
-cd frontend/svelte
+cd frontend
 npm i .
 npm run build
