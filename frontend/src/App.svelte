@@ -1,7 +1,7 @@
 <script lang="ts">
     import { toggle_class } from "svelte/internal";
-import type Course from "./classes/Course";
-import Term from "./classes/Term";
+    import type Course from "./classes/Course";
+    import Term from "./classes/Term";
     import CourseCard from "./components/CourseCard.svelte" ;
     import Header from "./components/Header.svelte"
 
@@ -13,16 +13,18 @@ import Term from "./classes/Term";
     
 
     async function termSelectCallback(term) {
+        // reset previous filters
+        selectedCourseLetters = [];
+        displayCourses = undefined;
+        focusedCourse = undefined;
+        
+        // reset the term
+        t = new Term();
         // get the term details
         await t.populate(term);
         
         // load filters 
         labels = t.allLetters
-
-        // reset previous filters
-        selectedCourseLetters = [];
-        displayCourses = undefined;
-        focusedCourse = undefined;
     }
 
 
