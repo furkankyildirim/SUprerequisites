@@ -1,23 +1,29 @@
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, send_from_directory
 from configparser import ConfigParser
-from .analysis import Analyze
-from .script import CoursePrerequisites
+from lib import Analyze
+from lib import CoursePrerequisites
 import os
 
 config = ConfigParser()
 config.read("./config.ini")
 app = Flask(__name__)
 
-app.config["CATALOG_PATH"] = os.path.join(
-    os.path.dirname(__file__), '..', 'Catalogs')
+app.config["ROOT_PATH"] = os.path.join(os.path.dirname(__file__))
 
-
+#region SERVE SVELTE APP
+static_path = os.path.join(app.config["ROOT_PATH"], "frontend", "public")
 @app.route('/')
 def index():
-    data = dict()
-    data['name'] = 'Sabancı University Analyzing Course Prerequisites'
-    return jsonify(data)
+    print(static_path, "index.html")
+    return send_from_directory(static_path, "index.html")
 
+@app.route('/<path:path>')
+def statics(path):
+    return send_from_directory(static_path, path)
+#endregion
+
+
+app.config["CATALOG_PATH"] = os.path.join(app.config["ROOT_PATH"], 'Catalogs')
 
 @app.route('/terms')
 def getTerms():
@@ -29,6 +35,8 @@ def uploadCatalog():
 
     if "file" not in request.files:
         return jsonify({"message": "Please attach a file.", "isSuccess": False})
+
+
     catalog = request.files['file']
     term = request.args.get('term')
 
@@ -55,8 +63,9 @@ def uploadCatalog():
             "isSuccess": False
         })
 
-
-@app.route('/delete')
+# this should be behind authorization checks
+"""
+@app.route('/delete', methods=["DELETE"])
 def deleteCatalog():
     term = request.args.get('term')
 
@@ -73,6 +82,8 @@ def deleteCatalog():
         "message": "Course catalog and analyzes have been successfully deleted from the system.",
         "isSuccess": True
     }))
+"""
+
 
 @app.route('/prerequisites')
 def getPrerequisites():

@@ -1,9 +1,13 @@
+# ignore dev versions of the frontend
+/frontend-other/
+
 # ignore jupyter notebook stuff
 .ipynb_checkpoints
 **/*.ipynb_checkpoints/
 
 # ignore json files outside Catalogs/
 !Catalogs/**/*.json
+!samples/**/*.json
 *.json
 **/*.json
 
@@ -27,7 +31,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/

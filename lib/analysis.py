@@ -126,7 +126,7 @@ class Analyze():
         for c in prereq_text:
             if inside_brackets:
                 if c == ")":
-                    if is_ambiguous(substatement):
+                    if Analyze.is_ambiguous(substatement):
                         return True
                     inside_brackets = False
                     substatement = ""
