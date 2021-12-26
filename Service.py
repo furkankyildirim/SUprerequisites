@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, send_from_directory, redirect, url_for, session
 from flask.helpers import flash
 from flask.templating import render_template
+from sympy.logic.inference import satisfiable
 from wtforms import Form, StringField, PasswordField, BooleanField
 from functools import wraps
 from configparser import ConfigParser
@@ -83,6 +84,8 @@ def uploadCatalog():
 
     catalog = request.files['file']
     term = request.args.get('term')
+    ambiguous = request.args.get('ambiguous', False, type=lambda v: v.lower() == 'true')
+    unsatisfiable = request.args.get('unsatisfiable', False, type=lambda v: v.lower() == 'true')
 
     if os.path.isfile(app.config['CATALOG_PATH']+'/Originals/' + term + '.json'):
         return(jsonify({
@@ -92,7 +95,7 @@ def uploadCatalog():
 
     CoursePrerequisites(catalog, term)
     try:
-        Analyze(term)
+        Analyze(term, raise_ambiguous=ambiguous, raise_unsatisfiable=unsatisfiable)
         return(jsonify({
             "message": "Course catalog was uploaded to the system and analyzed.",
             "isSuccess": True
@@ -103,7 +106,7 @@ def uploadCatalog():
 
         return jsonify({
             "message": "Course catalog has cycles, analysis was not completed.",
-            "errors": e.cyclics,
+            "errors": e.problems,
             "isSuccess": False
         })
 
