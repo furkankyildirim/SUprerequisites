@@ -23,7 +23,7 @@ def login_required(f):
 config = ConfigParser()
 app = Flask(__name__)
 config.read("./config.ini")
-app.config['SECRET_KEY'] = os.urandom(12)
+app.config['SECRET_KEY'] = config["Secrets"]["key"];
 app.config["ROOT_PATH"] = os.path.join(os.path.dirname(__file__))
 
 #region SERVE SVELTE APP
