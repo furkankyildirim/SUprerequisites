@@ -1,8 +1,5 @@
 from flask import Flask, request, jsonify, send_from_directory, redirect, url_for, session
 from flask.helpers import flash
-from flask.templating import render_template
-from sympy.logic.inference import satisfiable
-from wtforms import Form, StringField, PasswordField, BooleanField
 from functools import wraps
 from configparser import ConfigParser
 from lib import Analyze
@@ -102,7 +99,7 @@ def uploadCatalog():
         }))
     except Analyze.CycleError as e:
         # delete the faulty catalog from storage
-        os.remove(app.config['CATALOG_PATH']+'/Originals/' + term + '.json')
+        os.remove(app.config['CATALOG_PATH'] + '/Originals/' + term + '.json')
 
         return jsonify({
             "message": "Course catalog has cycles; analysis was not completed.",
@@ -111,7 +108,7 @@ def uploadCatalog():
         })
     except Analyze.AmbiguousError as e:
         # delete the faulty catalog from storage
-        os.remove(app.config['CATALOG_PATH']+'/Originals/' + term + '.json')
+        os.remove(app.config['CATALOG_PATH'] + '/Originals/' + term + '.json')
 
         return jsonify({
             "message": "Course catalog has ambiguous prerequisites; analysis was not completed.",
@@ -120,7 +117,7 @@ def uploadCatalog():
         })
     except Analyze.UnsatisfiableError as e:
         # delete the faulty catalog from storage
-        os.remove(app.config['CATALOG_PATH']+'/Originals/' + term + '.json')
+        os.remove(app.config['CATALOG_PATH'] + '/Originals/' + term + '.json')
 
         return jsonify({
             "message": "Course catalog has courses that are unsatisfiable due to missing courses; analysis was not completed.",
@@ -132,7 +129,6 @@ def uploadCatalog():
 @app.route('/delete', methods=["GET", "POST"])
 @login_required
 def deleteCatalog():
-    
     if request.method == 'GET':
         return send_from_directory(templates_path, "delete.html")
     
@@ -163,11 +159,9 @@ def login():
         remember = request.form.get('remember')
 
         if username == config['Admin']['username'] and password == config['Admin']['password']:
-            print("login successful")
             session['logged_in'] = True
             return redirect(url_for('admin'))
         else:
-            print("login failed bcs wrong uname pwd")
             flash('Username or password is wrong', 'danger')
             return redirect(url_for('login'))
      

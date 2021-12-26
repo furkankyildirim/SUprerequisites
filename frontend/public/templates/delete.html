@@ -14,32 +14,84 @@
   <link rel='stylesheet' href='/global.css'>
 
   <script>
-    setParams = () => {
-      var term = document.getElementById('term').value;
-      var uploadPath = 'delete?term=';
-      var action = uploadPath + term;
-      document.getElementById('form').action = action;
+    closeModal = () => {
+      document.getElementById("modal").getElementsByTagName("article")[0].className = "";
+      location.href = '/admin';
     }
 
     async function loadTerms() {
       const t = await fetch("terms");
       console.log(t);
       if (t.ok) {
-          terms = (await t.json()).sort();
-          document.getElementById("term-selector").innerHTML = terms.map((term => 
-            `<option value="${term}">${["Fall", "Spring", "Summer"][parseInt(term.slice(term.length - 2))-1]} ${term.slice(0, 4)}</option>` 
-          )).join("\n");
+        terms = (await t.json()).sort();
+        document.getElementById("term-selector").innerHTML = terms.map((term =>
+          `<option value="${term}">${["Fall", "Spring", "Summer"][parseInt(term.slice(term.length - 2)) - 1]} ${term.slice(0, 4)}</option>`
+        )).join("\n");
       } else {
-          throw t.status
+        throw t.status
       }
-    
     }
   </script>
+  <script>
 
+    async function deleteFile() {
+      var term = document.getElementById('term-selector').value;
+
+      try {
+        //body.append("file", void(0))
+        const response = await (await fetch(`/delete?term=${term}`, {
+          method: "POST",
+        }))
+          .json();
+
+        const modal = document.getElementById("modal");
+        const container = modal.getElementsByTagName("article")[0];
+        const status = response.isSuccess ? "is-success" : "is-danger";
+        container.classList.add("message"); container.classList.add(status);
+
+
+        modal.getElementsByTagName("p")[0].textContent = response.isSuccess ? "Success" : "Error";
+        document.getElementById("message-body").textContent = response.message;
+        modal.classList.add('is-active')
+
+
+        // modal.getElementsByTagName("h4")[0].textContent = response.isSuccess ? "Success" : "Error";
+        // modal.getElementsByTagName("span")[0].textContent = response.message;
+        // // show the text box thing if we have errors to display
+        // modal.getElementsByTagName("pre")[0].style.display = response.errors ? undefined : "none";
+        // modal.getElementsByTagName("pre")[0].textContent = JSON.stringify(response.errors, undefined, 2);
+
+        modal.classList.add('is-active');
+      } catch (e) {
+        console.error(e)
+      }
+    }
+  </script>
 </head>
 
 <body onload="loadTerms()">
+  <div class="modal" id="modal">
+    <div class="modal-background"></div>
+    <div class="modal-content">
+      <article class="message" >
+        <div class="message-header">
+          <p></p>
+        </div>
+        <div class="message-body" id="message-body"></div>
+      </article>
+    </div>
+    <button class="modal-close is-large" aria-label="close" onclick="closeModal()"></button>
+  </div>
 
+  <!-- <div class="modal" id="message">
+    <div class="modal-background" onclick="closeModal()"></div>
+    <div class="modal-content">
+      <h4></h4>
+      <span></span>
+      <pre></pre>
+    </div>
+    <button class="modal-close is-large" aria-label="close" onclick="closeModal()"></button>
+  </div> -->
 
   <section class="hero is-fullheight">
     <div class="hero-body">
@@ -49,29 +101,19 @@
           <div class="box">
             <form id="form" method="POST" class="field">
 
-              <!-- <div class="field">            
-                <div class="select is-large ">
-                  <select>
-                    <option>Select Term</option>
-                  </select>
-                </div>
-              </div> -->
-
               <div class="field">
                 <div class="input-group">
                   <span class="input-group-text">Select Term:</span>
                   <select class="form-select form-control" aria-label="Term selector" id="term-selector">
                   </select>
-              </div>
+                </div>
 
-              </div>
-
-              <div class="field">
-                <button onclick="setParams()" type="submit" class="button is-block is-danger is-large is-fullwidth">
-                  Delete</button>
               </div>
             </form>
-
+            <div class="field">
+              <button onclick="deleteFile()" class="button is-block is-danger is-large is-fullwidth">
+                Delete</button>
+            </div>
             <div class="field">
               <button onclick="window.history.go(-1); return false;"
                 class="button is-block is-link is-large is-fullwidth">Go Back</button>

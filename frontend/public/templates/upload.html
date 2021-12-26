@@ -16,11 +16,12 @@
 
   <script>
 
-    function closeModal() {
-      document.getElementById("message").classList.remove('is-active');
+    closeModal = () => {
+      document.getElementById("modal").getElementsByTagName("article")[0].className = "";
+      location.href = '/admin';
     }
 
-    async function sendFile() { 
+    async function sendFile() {
       var term = document.getElementById('term').value;
       var uploadPath = 'upload?term=';
       var action = uploadPath + term;
@@ -34,24 +35,32 @@
         const body = new FormData(form)
         // body.append("file", void(0))
         const response = await (await fetch(`/upload?term=${term}&ambiguous=${AMBIGUOUS}&unsatisfiable=${UNSATISFIABLE}`, {
-            method:"POST",
-            body
-          }))
+          method: "POST",
+          body
+        }))
           .json();
-        const modal = document.getElementById("message");
-        
-        modal.getElementsByTagName("h4")[0].textContent = response.isSuccess ? "Success" : "Error";
-        modal.getElementsByTagName("span")[0].textContent = response.message;
-        // show the text box thing if we have errors to display
-        modal.getElementsByTagName("pre")[0].style.display = response.errors ? undefined : "none";
-        modal.getElementsByTagName("pre")[0].textContent = JSON.stringify(response.errors, undefined, 2);
+
+        const modal = document.getElementById("modal");
+        const container = modal.getElementsByTagName("article")[0];
+        const status = response.isSuccess ? "is-success" : "is-danger";
+        container.classList.add("message"); container.classList.add(status);
+
+
+        modal.getElementsByTagName("p")[0].textContent = response.isSuccess ? "Success" : "Error";
+        document.getElementById("message-body").textContent = response.message;
+        modal.classList.add('is-active')
+
+
+        // modal.getElementsByTagName("h4")[0].textContent = response.isSuccess ? "Success" : "Error";
+        // modal.getElementsByTagName("span")[0].textContent = response.message;
+        // // show the text box thing if we have errors to display
+        // modal.getElementsByTagName("pre")[0].style.display = response.errors ? undefined : "none";
+        // modal.getElementsByTagName("pre")[0].textContent = JSON.stringify(response.errors, undefined, 2);
 
         modal.classList.add('is-active');
-      } catch(e) {
+      } catch (e) {
         console.error(e)
       }
-
-
     }
   </script>
 
@@ -59,16 +68,18 @@
 
 <body>
 
-  <div class="modal" id="message">
-    <div class="modal-background" onclick="closeModal()"></div>
+  <div class="modal" id="modal">
+    <div class="modal-background"></div>
     <div class="modal-content">
-      <h4></h4>
-      <span></span>
-      <pre></pre>
+      <article class="message">
+        <div class="message-header">
+          <p></p>
+        </div>
+        <div class="message-body" id="message-body"></div>
+      </article>
     </div>
     <button class="modal-close is-large" aria-label="close" onclick="closeModal()"></button>
   </div>
-  
 
   <section class="hero is-fullheight">
     <div class="hero-body">
@@ -78,7 +89,7 @@
           <div class="box">
             <form id="form" method="POST" enctype="multipart/form-data" class="field">
 
-              
+
               <div class="field">
                 <div class="file is-large is-boxed has-name" id="selector">
                   <label class="file-label" id="parent">
