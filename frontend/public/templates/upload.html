@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset='utf-8'>
+  <meta name='viewport' content='width=device-width,initial-scale=1'>
+  <link rel='stylesheet' href='vendor/bootstrap/css/bootstrap.min.css'>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+  <title>SU Prerequisites</title>
+
+  <link rel='icon' type='image/png' href='../favicon.png'>
+  <link rel='stylesheet' href='/global.css'>
+  <link rel='stylesheet' href='/build/bundle.css'>
+
+  <script defer src='/build/bundle.js'></script>
+
+  <script>
+    setParams = () => {
+      var term = document.getElementById('term').value;
+      var uploadPath = 'upload?term=';
+      var action = uploadPath + term;
+      document.getElementById('form').action = action;
+    }
+  </script>
+
+</head>
+
+<body>
+
+
+  <section class="hero is-fullheight">
+    <div class="hero-body">
+      <div class="container has-text-centered">
+        <div class="column is-4 is-offset-4">
+          <h3 class="title">Upload Catalog</h3>
+          <div class="box">
+            <form id="form" method="POST" enctype="multipart/form-data" class="field">
+              <div class="field">
+                <div class="file is-large is-boxed has-name" id="selector">
+                  <label class="file-label" id="parent">
+                    <input class="file-input" type="file" name="file" id="file" onchange="showFileName()">
+                    <span class="file-cta">
+                      <span class="file-icon">
+                        <i class="fa fa-upload"></i>
+                      </span>
+                      <span class="file-label">
+                        Select Catalog
+                      </span>
+                    </span>
+                    <script>
+                      document.getElementById('catalog').onchange = function () {
+                        var span = document.createElement("span");
+                        var text = document.createTextNode(document.getElementById('file').files.item(0).name);
+                        span.className = "file-name"; span.appendChild(text);
+                        var parent = document.getElementById('parent');
+                        if (parent.hasChildNodes) {
+                          parent.removeChild(parent.firstElementChild);
+                        }
+                        document.getElementById('parent').appendChild(span);
+                      };
+                    </script>
+                  </label>
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="control">
+                  <input class="input is-large" type="number" id="term" name="term" placeholder="Term">
+                </div>
+              </div>
+
+              <div class="field">
+                <button onclick="setParams()" type="submit" class="button is-block is-primary is-large is-fullwidth">
+                  Upload</button>
+              </div>
+            </form>
+
+            <div class="field">
+              <button onclick="window.history.go(-1); return false;"
+                class="button is-block is-link is-large is-fullwidth">Go Back</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</body>
+
+</html>

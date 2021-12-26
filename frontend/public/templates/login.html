@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset='utf-8'>
+  <meta name='viewport' content='width=device-width,initial-scale=1'>
+  <link rel='stylesheet' href='vendor/bootstrap/css/bootstrap.min.css'>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" />
+
+  <title>SU Prerequisites</title>
+
+  <link rel='icon' type='image/png' href='../favicon.png'>
+  <link rel='stylesheet' href='/global.css'>
+  <link rel='stylesheet' href='/build/bundle.css'>
+
+  <script defer src='/build/bundle.js'></script>
+</head>
+
+<body>
+  <section class="hero is-fullheight">ƒ
+    <div class="hero-body">
+      <div class="container has-text-centered">
+        <div class="column is-4 is-offset-4">
+          <h3 class="title">Login</h3>
+          <div class="box">
+            <form method="POST" action="/login">
+              <div class="field">
+                <div class="control">
+                  <input class="input is-large" type="username" name="username" placeholder="Username" autofocus="">
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="control">
+                  <input class="input is-large" type="password" name="password" placeholder="Password">
+                </div>
+              </div>
+              <!-- <div class="field">
+                                <label class="checkbox">
+                                    <input type="checkbox" name="remember">
+                                    Remember me
+                                </label>
+                            </div> -->
+              <button class="button is-block is-info is-large is-fullwidth">Login</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</body>
+
+</html>

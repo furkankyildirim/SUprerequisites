@@ -1,4 +1,6 @@
-exec gunicorn Service:app \
+npm i .
+npm run build
+gunicorn Service:app \
 --workers=6 \
 --timeout=3600 \
 --log-level=debug \
