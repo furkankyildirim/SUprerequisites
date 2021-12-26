@@ -105,7 +105,25 @@ def uploadCatalog():
         os.remove(app.config['CATALOG_PATH']+'/Originals/' + term + '.json')
 
         return jsonify({
-            "message": "Course catalog has cycles, analysis was not completed.",
+            "message": "Course catalog has cycles; analysis was not completed.",
+            "errors": e.problems,
+            "isSuccess": False
+        })
+    except Analyze.AmbiguousError as e:
+        # delete the faulty catalog from storage
+        os.remove(app.config['CATALOG_PATH']+'/Originals/' + term + '.json')
+
+        return jsonify({
+            "message": "Course catalog has ambiguous prerequisites; analysis was not completed.",
+            "errors": e.problems,
+            "isSuccess": False
+        })
+    except Analyze.UnsatisfiableError as e:
+        # delete the faulty catalog from storage
+        os.remove(app.config['CATALOG_PATH']+'/Originals/' + term + '.json')
+
+        return jsonify({
+            "message": "Course catalog has courses that are unsatisfiable due to missing courses; analysis was not completed.",
             "errors": e.problems,
             "isSuccess": False
         })
@@ -145,9 +163,11 @@ def login():
         remember = request.form.get('remember')
 
         if username == config['Admin']['username'] and password == config['Admin']['password']:
+            print("login successful")
             session['logged_in'] = True
             return redirect(url_for('admin'))
         else:
+            print("login failed bcs wrong uname pwd")
             flash('Username or password is wrong', 'danger')
             return redirect(url_for('login'))
      

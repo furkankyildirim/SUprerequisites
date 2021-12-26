@@ -15,11 +15,43 @@
 
 
   <script>
-    setParams = () => {
+
+    function closeModal() {
+      document.getElementById("message").classList.remove('is-active');
+    }
+
+    async function sendFile() { 
       var term = document.getElementById('term').value;
       var uploadPath = 'upload?term=';
       var action = uploadPath + term;
-      document.getElementById('form').action = action;
+
+      const AMBIGUOUS = false;
+      const UNSATISFIABLE = false;
+
+      const form = document.getElementById("form")
+
+      try {
+        const body = new FormData(form)
+        // body.append("file", void(0))
+        const response = await (await fetch(`/upload?term=${term}&ambiguous=${AMBIGUOUS}&unsatisfiable=${UNSATISFIABLE}`, {
+            method:"POST",
+            body
+          }))
+          .json();
+        const modal = document.getElementById("message");
+        
+        modal.getElementsByTagName("h4")[0].textContent = response.isSuccess ? "Success" : "Error";
+        modal.getElementsByTagName("span")[0].textContent = response.message;
+        // show the text box thing if we have errors to display
+        modal.getElementsByTagName("pre")[0].style.display = response.errors ? undefined : "none";
+        modal.getElementsByTagName("pre")[0].textContent = JSON.stringify(response.errors, undefined, 2);
+
+        modal.classList.add('is-active');
+      } catch(e) {
+        console.error(e)
+      }
+
+
     }
   </script>
 
@@ -27,6 +59,16 @@
 
 <body>
 
+  <div class="modal" id="message">
+    <div class="modal-background" onclick="closeModal()"></div>
+    <div class="modal-content">
+      <h4></h4>
+      <span></span>
+      <pre></pre>
+    </div>
+    <button class="modal-close is-large" aria-label="close" onclick="closeModal()"></button>
+  </div>
+  
 
   <section class="hero is-fullheight">
     <div class="hero-body">
@@ -40,7 +82,8 @@
               <div class="field">
                 <div class="file is-large is-boxed has-name" id="selector">
                   <label class="file-label" id="parent">
-                    <input class="file-input" type="file" name="file" id="file" onchange="showFileName()">
+                    <span style="display: none;"></span>
+                    <input class="file-input" type="file" name="file" id="file">
                     <span class="file-cta">
                       <span class="file-icon">
                         <i class="fa fa-upload"></i>
@@ -50,14 +93,12 @@
                       </span>
                     </span>
                     <script>
-                      document.getElementById('catalog').onchange = function () {
+                      document.getElementById('file').onchange = function () {
                         var span = document.createElement("span");
                         var text = document.createTextNode(document.getElementById('file').files.item(0).name);
                         span.className = "file-name"; span.appendChild(text);
                         var parent = document.getElementById('parent');
-                        if (parent.hasChildNodes) {
-                          parent.removeChild(parent.firstElementChild);
-                        }
+                        parent.removeChild(parent.firstElementChild);
                         document.getElementById('parent').appendChild(span);
                       };
                     </script>
@@ -72,7 +113,7 @@
               </div>
 
               <div class="field">
-                <button onclick="setParams()" type="submit" class="button is-block is-primary is-large is-fullwidth">
+                <button onclick="sendFile()" type="button" class="button is-block is-primary is-large is-fullwidth">
                   Upload</button>
               </div>
             </form>
