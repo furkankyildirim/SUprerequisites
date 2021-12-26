@@ -56,7 +56,12 @@ export default {
             targets: [{ 
                 src: 'node_modules/bootstrap/dist/**/*', 
                 dest: 'public/vendor/bootstrap' 
-            }]
+            },
+			{
+				src: "node_modules/bulma/css/*",
+				dest: 'public/vendor/bulma'
+			}
+		]
 		}),
 
 		// If you have external dependencies installed from
