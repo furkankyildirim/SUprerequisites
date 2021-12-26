@@ -1,7 +1,5 @@
 <script lang="ts">
     import { createEventDispatcher } from 'svelte';
-import { each } from 'svelte/internal';
-    import type Course from '../classes/Course';
     const dispatch = createEventDispatcher();
     export let preqs: string;
     function courseClicked(e: Event) {

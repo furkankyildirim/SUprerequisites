@@ -68,7 +68,7 @@
     
             {#if labels}
             <div class="input-group-text">
-                <select class="form-select" multiple bind:value={selectedCourseLetters} on:change={() => displayCourses = t.getCoursesByLetters(selectedCourseLetters)}>
+                <select class="form-select" multiple bind:value={selectedCourseLetters} on:change={() => {displayCourses = t.getCoursesByLetters(selectedCourseLetters);focusedCourse=undefined}}>
                     {#each labels as label}
                         <option value={label}>{label}</option>
                     {/each}

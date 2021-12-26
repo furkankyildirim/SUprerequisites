@@ -1,11 +1,18 @@
 <script lang="ts">
   import type Course from "../classes/Course";
   import CoursePreqs from "./CoursePreqs.svelte";
+  import { createEventDispatcher } from 'svelte';
 
   export let course: Course;
+  const dispatch = createEventDispatcher();
+  function courseClicked(e: Event) {
+        dispatch("focusCourse", {
+            course: course.shorthand
+        })
+    }
 </script>
 
-<div class="card course-card">
+<div class="card course-card" on:click={courseClicked} >
   <div class="card-body">
     <h5 class="card-title"><span class="course-id">{course.letters} {course.code}</span><br/><span class="course-name">{course.name}</span></h5>
     <p class="card-text">
