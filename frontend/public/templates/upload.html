@@ -26,8 +26,8 @@
       var uploadPath = 'upload?term=';
       var action = uploadPath + term;
 
-      const AMBIGUOUS = false;
-      const UNSATISFIABLE = false;
+      const AMBIGUOUS = document.getElementById("ambiguous").value;
+      const UNSATISFIABLE = document.getElementById("unsatisfiable").value;
 
       const form = document.getElementById("form")
 
@@ -121,6 +121,18 @@
                 <div class="control">
                   <input class="input is-large" type="number" id="term" name="term" placeholder="Term">
                 </div>
+              </div>
+
+              <div class="field" style="flex-direction: row;">
+                <label class="checkbox">
+                  <input type="checkbox" name="ambiguous", id="ambiguous">
+                  Ambiguous
+                </label>
+
+                <label class="checkbox">
+                  <input type="checkbox" name="unsatisfiable", id="unsatisfiable">
+                  Unsatisfiable
+                </label>
               </div>
 
               <div class="field">
