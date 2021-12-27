@@ -1,23 +1,32 @@
+import type { Node, Edge, Filters } from "./GraphData";
+
 export default class Course {
   #letters: string;
   #code: string;
   #name: string;
-  #oldPreq: string;
-  #newPreq?: string;
+  #newPreq: string;
+  #oldPreq?: string;
 
-  constructor(name: string, oldPreq: string) {
+  constructor(name: string, newPreq: string) {
     this.#name = name.split(" - ")[1];
 
     const lhs = name.split(" - ")[0].split(" ");
     this.#letters = lhs[0];
     this.#code = lhs[1];
 
-    this.#newPreq = oldPreq;
-    this.#oldPreq = oldPreq;
+    this.#oldPreq = newPreq;
+    this.#newPreq = newPreq;
   }
 
-  addNewPrerequisite(newPreq) {
-    this.#newPreq = this.#newPreq;
+  // gives us the required edges as well as the sub nodes
+  get graphThings(): { nodes: Node[]; edges: Edge[] } {
+    const r = {nodes: [], edges: []};
+
+    return r;
+  }
+
+  addOldPrerequisite(oldPreq) {
+    this.#oldPreq = oldPreq;
   }
 
   lettersAre(letters: string): boolean {
@@ -28,8 +37,22 @@ export default class Course {
     return courseShorthand == this.shorthand;
   }
 
+  fits(filters: Filters): boolean {
+    const n = this.codeAsNumber;
+    return (
+      new Set(filters.exacts).has(this.shorthand) 
+      || (
+        new Set(filters.letters).has(this.letters)
+        && (
+          (!filters.codes.start || filters.codes.start <= n)
+          && (!filters.codes.end || filters.codes.end >= n)
+        )
+      )
+    )
+  }
+
   get shorthand() {
-      return (this.#letters + this.#code)
+    return this.#letters + this.#code;
   }
   get fullName() {
     return `${this.#letters} ${this.#code} - ${this.#name}`;
@@ -42,13 +65,16 @@ export default class Course {
   get code() {
     return this.#code;
   }
+  get codeAsNumber():number {
+    return parseInt(/\d+/.exec(this.#code)[0]);
+  }
 
   get name() {
     return this.#name;
   }
 
   get hasPrerequisites() {
-    return this.#oldPreq ? true : false;
+    return this.#newPreq ? true : false;
   }
 
   get oldPrerequisites() {
@@ -56,7 +82,7 @@ export default class Course {
   }
 
   get changed() {
-    return this.#newPreq ? true : false;
+    return this.#oldPreq ? true : false;
   }
 
   get newPrerequisites() {
