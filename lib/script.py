@@ -3,7 +3,7 @@ import requests
 import json
 import re
 
-PREREQUISITE_RE = re.compile("(\w+) level  ((\w+) ([0-9]+))( Minimum Grade of (\w))?")
+PREREQUISITE_RE = re.compile("(\w+)(?: )level(?: )+((\w+) ([0-9]+\w+))((?: )Minimum Grade(?: )of(?: )(\w))?")
 
 def parse_prereq_string(prereqs):
   prereqs = prereqs.replace(" and ", "&")
