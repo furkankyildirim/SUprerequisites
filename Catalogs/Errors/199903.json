@@ -1,0 +1,1 @@
+{"url": [], "ambiguous": {}, "unsatisfiable": {"CS406": {"prerequisites": "CS301 & CS401", "missing_courses": ["CS301", "CS401"]}, "ECON412": {"prerequisites": "ECON301 & ECON330", "missing_courses": ["ECON301", "ECON330"]}, "TE303": {"prerequisites": "ENS212", "missing_courses": ["ENS212"]}, "TE405": {"prerequisites": "TE301", "missing_courses": ["TE301"]}}}
