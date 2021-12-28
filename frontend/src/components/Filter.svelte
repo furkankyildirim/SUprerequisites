@@ -61,7 +61,7 @@
       <input type="text" class="form-control" id="exacts" placeholder="MATH101,MATH102,..." bind:value={exacts}>
     </div>
 
-    <button on:click={makeGraph}>Update Graph</button>
+    {#if mode === "graph"}<button on:click={makeGraph} class="btn btn-secondary">Update</button> {/if}
   {/if}
 </div>
 
