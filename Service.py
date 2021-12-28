@@ -43,7 +43,7 @@ app.config["CATALOG_PATH"] = os.path.join(app.config["ROOT_PATH"], 'Catalogs')
 
 @app.route('/terms')
 def getTerms():
-    return jsonify([file[:file.find('.')] for file in os.listdir(app.config["CATALOG_PATH"]+'/Originals') if os.path.isfile(os.path.join(app.config["CATALOG_PATH"]+'/Originals', file))])
+    return jsonify([file[:file.find('.')] for file in os.listdir(app.config["CATALOG_PATH"]+'/Updates') if os.path.isfile(os.path.join(app.config["CATALOG_PATH"]+'/Updates', file))])
 
 
 @app.route('/prerequisites')
