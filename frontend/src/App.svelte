@@ -54,12 +54,12 @@
     <Header callback={termSelectCallback}/>
     <div class="page">
             <div id="view">
+                {#if focusedCourse}
+                    <CourseCard course={focusedCourse} on:focusCourse={chooseFocusCourseCallback} focused={true} on:unfocusCourse={() => {focusedCourse = undefined; displayCourses = undefined}}/>
+                {/if}
                 {#if displayMode==="graph" }
-                    <Graph {term} {filters} bind:makeGraph nodeSize=24/>
+                    <Graph {displayCourses} bind:makeGraph nodeSize=24/>
                 {:else}
-                    {#if focusedCourse}
-                        <CourseCard course={focusedCourse} on:focusCourse={chooseFocusCourseCallback} focused={true} on:unfocusCourse={() => {focusedCourse = undefined; displayCourses = undefined}}/>
-                    {/if}
                     {#if displayCourses}
                         {#each displayCourses as course}
                             <CourseCard {course} on:focusCourse={chooseFocusCourseCallback}/>

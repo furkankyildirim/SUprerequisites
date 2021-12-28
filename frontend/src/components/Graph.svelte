@@ -2,12 +2,10 @@
 import type { SimulationNodeDatum } from "d3";
 
     import * as d3 from "d3";
-    import { Filters, GraphThingsReturnType, mergeGraphData } from "../classes/GraphData";
-    import type Term from "../classes/Term";
+    import type Course from "../classes/Course";
+    import { GraphThingsReturnType, mergeGraphData } from "../classes/GraphData";
 
-    export let term: Term;
-    export let filters: Filters;
-
+    export let displayCourses: Course[];
     let container: HTMLDivElement;
     let width;
     let height;
@@ -139,7 +137,7 @@ import type { SimulationNodeDatum } from "d3";
     }
 
     function getData() {
-        const r: GraphThingsReturnType = term.getCoursesByFilter(filters).reduce((prev, course) => {
+        const r: GraphThingsReturnType = displayCourses.reduce((prev, course) => {
             return mergeGraphData(prev, course.graphThings)
         }, {nodes: [], edges: []} as GraphThingsReturnType);
 
