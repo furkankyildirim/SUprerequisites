@@ -1,4 +1,33 @@
-body {
+body, html {
     width: 100%;
     height: 100%;
+}
+
+.link {
+    stroke: #000;
+    stroke-width: 1.5px;
+}
+
+.node {
+    cursor: move;
+    fill: #002776;
+    stroke: #000;
+    stroke-width: 0;
+}
+
+.node.fixed {
+    stroke: #f00;
+    stroke-width: 1px;
+}
+  
+.label {
+    text-anchor: middle;
+    fill: white;
+    font-family: Arial;
+    font-size: 10px;
+    -webkit-user-select: none; /* Safari */        
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */
+    
 }

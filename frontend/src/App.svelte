@@ -1,44 +1,48 @@
 <script lang="ts">
-    import { toggle_class } from "svelte/internal";
+    import Filter from './components/Filter.svelte';
+
     import type Course from "./classes/Course";
+    import type { Filters } from "./classes/GraphData";
     import Term from "./classes/Term";
     import CourseCard from "./components/CourseCard.svelte" ;
     import Header from "./components/Header.svelte"
+    import Graph from './components/Graph.svelte';
+    // import * as d3 from "d3";
 
-    let t = new Term();
-    let labels: string[];
-    let displayCourses: Course[];
-    let selectedCourseLetters = [];
+    let term = new Term();
+    let filters: Filters = {letters: [], codes: {}, exacts: []};
+    let displayMode: "graph" | "cards" = "cards";
     let focusedCourse: Course;
-    
+    let makeGraph;
 
-    async function termSelectCallback(term) {
+    $: displayCourses = focusedCourse ? Array.from(term.getAllSubPrereqs(focusedCourse)) : term.getCoursesByFilter(filters);
+
+
+    async function termSelectCallback(chosenTerm) {
         // reset previous filters
-        selectedCourseLetters = [];
+        filters = {letters: [], codes: {}, exacts: []};
         displayCourses = undefined;
         focusedCourse = undefined;
         
         // reset the term
-        t = new Term();
-        // get the term details
-        await t.populate(term);
+        term = new Term();
         
-        // load filters 
-        labels = t.allLetters
+        // get the term details
+        console.log(chosenTerm)
+        await term.populate(chosenTerm);
+        term = term;
     }
-
+    
 
     async function chooseFocusCourseCallback({detail: {course: toFocusCourse}} : CustomEvent) {
         console.log("focusing on " + toFocusCourse);
-        const toFocusCourseObj = t.getCourseByLettersAndCode(toFocusCourse);
+        filters = {letters: [], codes: {}, exacts: []};
+        const toFocusCourseObj = term.getCourseByLettersAndCode(toFocusCourse);
         if (!toFocusCourseObj) { 
             alert(toFocusCourse + " does not exist in this catalog!")
         } else {
             focusedCourse = toFocusCourseObj;
-            displayCourses = Array.from(t.getAllSubPrereqs(focusedCourse));
-
         }
-        
     }
 
 
@@ -48,39 +52,23 @@
 
 <main>
     <Header callback={termSelectCallback}/>
-
-
-<div class="page">
-        <div id="view">
-            {#if focusedCourse}
-            <div class="focus-area">
-                <CourseCard course={focusedCourse} on:focusCourse={chooseFocusCourseCallback}/>
+    <div class="page">
+            <div id="view">
+                {#if displayMode==="graph" }
+                    <Graph {term} {filters} bind:makeGraph nodeSize=24/>
+                {:else}
+                    {#if focusedCourse}
+                        <CourseCard course={focusedCourse} on:focusCourse={chooseFocusCourseCallback} focused={true} on:unfocusCourse={() => {focusedCourse = undefined; displayCourses = undefined}}/>
+                    {/if}
+                    {#if displayCourses}
+                        {#each displayCourses as course}
+                            <CourseCard {course} on:focusCourse={chooseFocusCourseCallback}/>
+                        {/each}
+                    {/if}
+                {/if}
             </div>
-            {/if}
-            {#if displayCourses}
-                {#each displayCourses as course}
-                    <CourseCard {course} on:focusCourse={chooseFocusCourseCallback}/>
-                {/each}
-            {/if}
-        </div>
-        <div id="filters">
-            <h1>Filters</h1>
-    
-            {#if labels}
-            <div class="input-group-text">
-                <select class="form-select" multiple bind:value={selectedCourseLetters} on:change={() => {displayCourses = t.getCoursesByLetters(selectedCourseLetters);focusedCourse=undefined}}>
-                    {#each labels as label}
-                        <option value={label}>{label}</option>
-                    {/each}
-                </select>
-            </div>
-            {/if}
-            {#if !labels}
-            <p>Please choose a term from the top right!</p>
-            {/if}
-        </div>
-</div>
-    
+        <Filter {term} on:filterChange bind:mode={displayMode} bind:filters={filters} {makeGraph}/>
+    </div>
 </main>
 
 <style>
@@ -88,18 +76,20 @@ main {
     background-color: rgba(255,255,255,.15);
 	width: 100%;
 	height: 100%;
+    display:flex;
+    flex-direction: column;
 }
 
 .page {
-    margin-top: 1rem;
+    margin: 1rem 1rem 0;
     display: grid;
     grid-gap: 10px;
     grid-template-rows: auto;
     grid-template-columns: 8fr 3fr;
+    flex-grow: 1;
 }
 
 #view {
-
     padding: 1rem;
     box-sizing: border-box;
     display: grid;
@@ -108,12 +98,4 @@ main {
     grid-gap: 10px;
 }
 
-.focus-area {
-    grid-column: 1 / -1;
-    margin-bottom: 1rem;
-}
-
-#filters > * {
-    text-align: center;
-}
 </style>
