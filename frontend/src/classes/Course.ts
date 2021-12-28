@@ -20,7 +20,7 @@ export default class Course {
     this.#letters = lhs[0];
     this.#code = lhs[1];
 
-    this.#oldPreq = "";
+    this.#oldPreq = undefined;
     this.#newPreq = newPreq;
   }
 

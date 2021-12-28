@@ -6,7 +6,7 @@
   const urlParams = new URLSearchParams(window.location.search);
   export let focused = false;
   export let course: Course;
-  const useDetails = urlParams.has('details') && course.oldPrerequisites;
+  const useDetails = urlParams.has('details') && course.changed;
   const dispatch = createEventDispatcher();
   function courseClicked(e: Event) {
     dispatch("focusCourse", {
@@ -26,14 +26,16 @@
   <div class="card-body">
     <h5 class="card-title"><span class="course-id">{course.letters} {course.code}</span><br/><span class="course-name">{course.name}</span></h5>
     <p class="card-text">
-      {#if course.changed}
-          {#if useDetails}<span>Corrected Prerequisites: <CoursePreqs preqs={course.newPrerequisites} on:focusCourse/></span>
-          <br/>{/if}
-          <span>{#if useDetails}Original Prerequisites: {/if}<CoursePreqs preqs={course.oldPrerequisites} on:focusCourse/></span>
-      {:else if course.hasPrerequisites}
+      {#if course.hasPrerequisites}
+        {#if useDetails}
+          <span>Corrected Prerequisites: <CoursePreqs preqs={course.newPrerequisites} on:focusCourse/></span>
+          <br/>
+          <span>Original Prerequisites: <CoursePreqs preqs={course.oldPrerequisites} on:focusCourse/></span>
+        {:else}
           <span>Prerequisites: <CoursePreqs preqs={course.newPrerequisites} on:course/></span>
+        {/if}
       {:else}
-          No prerequisites
+        No prerequisites
       {/if}
   </p>
   
