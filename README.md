@@ -28,6 +28,10 @@ This project was built using Python, JavaScript and TypeScript.
 
 [Bulma](https://github.com/jgthms/bulma)
 
+## Deployment
+
+This project was deployed on [Heroku](https://www.heroku.com). You can try the project on https://suprerequisites.herokuapp.com.
+
 ## Contribution
 
 If you are a SU student and would like to contribute, please contact me. If you are not, and you would like
